@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Meteorite Impact</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .error-container {
+            position: relative;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .error-code {
+            color: white;
+            font-size: 15rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff0000;
+            margin: 0;
+            position: relative;
+            transition: transform 0.1s;
+        }
+        
+        .error-message {
+            color: #aaa;
+            font-size: 1.5rem;
+            margin-top: -20px;
+        }
+        
+        .home-link {
+            color: #3a7bd5;
+            text-decoration: none;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+        
+        .home-link:hover {
+            color: #00d2ff;
+        }
+        
+        .meteor {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            border-radius: 50%;
+            filter: drop-shadow(0 0 10px #ff5722);
+            animation: fall linear;
+            z-index: 5;
+        }
+        
+        .impact {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,87,34,0.8) 0%, rgba(255,87,34,0) 70%);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: impact 0.5s forwards;
+            z-index: 8;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        @keyframes impact {
+            to {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            to {
+                opacity: 0.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="error-container">
+        <h1 class="error-code">404</h1>
+        <p class="error-message">Page lost in space</p>
+        <a href="Meteorite.html" class="home-link">Return to Meteorite Executor</a>
+        </div>
+
+    <script>
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = `${Math.random() * 3}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            starsContainer.appendChild(star);
+        }
+
+        // Create meteor shower
+        function createMeteor() {
+            const meteor = document.createElement('div');
+            meteor.className = 'meteor';
+            
+            // Random position and size
+            const size = Math.random() * 40 + 20;
+            const left = Math.random() * window.innerWidth;
+            
+            meteor.style.width = `${size}px`;
+            meteor.style.height = `${size}px`;
+            meteor.style.left = `${left}px`;
+            meteor.style.top = `-${size}px`;
+            
+            // Random animation duration
+            const duration = Math.random() * 3 + 2;
+            meteor.style.animationDuration = `${duration}s`;
+            
+            meteor.addEventListener('animationend', function() {
+                // Create impact effect
+                const impact = document.createElement('div');
+                impact.className = 'impact';
+                impact.style.left = `${left}px`;
+                impact.style.top = `${window.innerHeight - 100}px`;
+                document.body.appendChild(impact);
+                
+                // Remove elements after animation
+                setTimeout(() => {
+                    impact.remove();
+                    meteor.remove();
+                }, 500);
+            });
+            
+            document.body.appendChild(meteor);
+        }
+        
+        // Initial meteors
+        for (let i = 0; i < 5; i++) {
+            setTimeout(createMeteor, i * 800);
+        }
+        
+        // Continuous meteor shower
+        setInterval(createMeteor, 1500);
+        
+        // Shake effect on impact
+        const errorCode = document.querySelector('.error-code');
+        document.addEventListener('animationstart', function(e) {
+            if (e.animationName === 'impact') {
+                errorCode.style.transform = 'translateX(-10px)';
+                setTimeout(() => {
+                    errorCode.style.transform = 'translateX(10px)';
+                }, 50);
+                setTimeout(() => {
+                    errorCode.style.transform = 'translateX(0)';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

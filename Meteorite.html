@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteorite Executor</title>
+    <link rel="icon" href="icns/Meteorite.icns">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0e17;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(26, 30, 48, 0.9);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #3a7bd5;
+            object-fit: contain;
+        }
+
+        .dropdown {
+            position: absolute;
+            right: 0;
+            top: 50px;
+            background: rgba(26, 30, 48, 0.95);
+            border-radius: 8px;
+            padding: 0.5rem 0;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 101;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(58, 123, 213, 0.2);
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #3a7bd5;
+            color: #3a7bd5;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feature-card {
+            background: rgba(26, 30, 48, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #3a7bd5;
+            margin-bottom: 1rem;
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .download-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #0a0e17;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #3a7bd5;
+        }
+
+        .close-modal {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #3a7bd5;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="icns/Meteorite.icns" alt="Meteorite Logo">
+            <h2>Meteorite Executor</h2>
+        </div>
+        
+        <div class="user-menu">
+            <img id="userAvatar" src="icns/user.icns" alt="Profile" class="profile-pic">
+            <div class="dropdown" id="userDropdown">
+                <div class="dropdown-item" id="userEmail"></div>
+                <div class="dropdown-item">⚙️ Settings</div>
+                <div class="dropdown-item" id="logoutBtn">🚪 Sign Out</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="tab-container">
+            <div class="tab active" data-tab="features">Why Meteorite?</div>
+            <div class="tab" data-tab="keys">Easy Key System</div>
+            <div class="tab" data-tab="download">Download</div>
+        </div>
+
+        <div class="tab-content active" id="features">
+            <div class="feature-card">
+                <h3>#1 Roblox Executor</h3>
+                <p>Meteorite Executor is the most powerful and reliable script executor for Roblox, offering unmatched performance and stability.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Lightning Fast Execution</h3>
+                <p>Our optimized engine executes scripts faster than any other executor on the market, giving you the competitive edge.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Undetectable & Secure</h3>
+                <p>Advanced anti-detection technology keeps you safe while using Meteorite, with regular updates to stay ahead of Roblox.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="keys">
+            <div class="feature-card">
+                <h3>Simple Key System</h3>
+                <p>Getting started with Meteorite is easier than ever with our streamlined key activation process.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Instant Activation</h3>
+                <p>No waiting periods - get your key instantly after completing our simple verification process.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Multiple Key Options</h3>
+                <p>Choose from daily, weekly, or permanent keys to suit your needs and budget.</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="download">
+            <div class="download-section">
+                <h2>Get Meteorite Executor Now</h2>
+                <p>Experience the most powerful Roblox script executor available</p>
+                <button class="download-btn" id="downloadBtn">Download for Windows</button>
+                <p style="margin-top: 1rem; color: rgba(255,255,255,0.7);">Coming soon for macOS and Linux</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="downloadModal">
+        <div class="modal-content">
+            <h3>Download Unavailable</h3>
+            <p>Meteorite Executor is currently in development and will be available soon.</p>
+            <p>Join our Discord to be notified when it releases!</p>
+            <button class="close-modal" id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const user = JSON.parse(localStorage.getItem('meteorite_user'));
+        if (!user) {
+            window.location.href = "login.html";
+        }
+
+        // Update UI with user data
+        document.getElementById('userEmail').textContent = user.email || 'User';
+        if (user.picture) {
+            document.getElementById('userAvatar').src = user.picture;
+        }
+
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // User dropdown
+        document.querySelector('.profile-pic').addEventListener('click', () => {
+            document.getElementById('userDropdown').classList.toggle('show');
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('meteorite_user');
+            window.location.href = "login.html";
+        });
+
+        // Close dropdown when clicking elsewhere
+        window.addEventListener('click', (e) => {
+            if (!e.target.matches('.profile-pic')) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+
+        // Download modal
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            document.getElementById('downloadModal').style.display = 'flex';
+        });
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('downloadModal').style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('downloadModal')) {
+                document.getElementById('downloadModal').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

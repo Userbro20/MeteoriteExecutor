@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteorite Executor - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0e17;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .comet {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(100, 149, 237, 0.8);
+            animation: cometFly linear;
+            z-index: 1;
+        }
+
+        @keyframes cometFly {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(100vw) translateY(100vh); opacity: 0; }
+        }
+
+        .login-container {
+            background: rgba(26, 30, 48, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo h1 {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .auth-toggle a {
+            color: #3a7bd5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        #googleSignIn, #googleSignUp {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="comets-container"></div>
+
+    <div class="login-container">
+        <div class="logo">
+            <h1>Meteorite Executor</h1>
+            <p>The most powerful Roblox exploiting tool</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form" id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+                <p class="error-message" id="loginError"></p>
+            </div>
+            <button type="submit" class="btn btn-primary">Sign In</button>
+            
+            <div class="divider">or</div>
+            
+            <div id="googleSignIn"></div>
+            
+            <div class="auth-toggle">
+                Don't have an account? <a href="#" id="showSignUp">Sign up</a>
+            </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form class="auth-form" id="signupForm" style="display: none;">
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password (min 8 chars)</label>
+                <input type="password" id="signupPassword" minlength="8" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required>
+                <p class="error-message" id="signupError"></p>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Account</button>
+            
+            <div class="divider">or</div>
+            
+            <div id="googleSignUp"></div>
+            
+            <div class="auth-toggle">
+                Already have an account? <a href="#" id="showLogin">Sign in</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Configuration - Only declared once
+        const CONFIG = {
+            GOOGLE_CLIENT_ID: (function() {
+                const parts = [
+                    'YOUR_CLIENT_ID',
+                    'apps',
+                    'googleusercontent',
+                    'com'
+                ];
+                return `${parts[0]}.${parts[1]}.${parts[2]}.${parts[3]}`;
+            })()
+        };
+
+        // Comet animation
+        function createComet() {
+            const comet = document.createElement('div');
+            comet.className = 'comet';
+            comet.style.left = Math.random() * 20 + 'vw';
+            comet.style.top = Math.random() * 20 + 'vh';
+            comet.style.animationDuration = (Math.random() * 5 + 3) + 's';
+            document.getElementById('comets-container').appendChild(comet);
+            setTimeout(() => comet.remove(), 8000);
+        }
+
+        // Form toggling
+        function setupFormToggles() {
+            document.getElementById('showSignUp').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'flex';
+            });
+
+            document.getElementById('showLogin').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('signupForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'flex';
+            });
+        }
+
+        // Google Auth
+        function handleCredentialResponse(response) {
+            console.log("Google Auth Response:", response);
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            
+            // Only set user data and redirect after successful authentication
+            localStorage.setItem('meteorite_user', JSON.stringify({
+                email: payload.email,
+                name: payload.name,
+                picture: payload.picture,
+                timestamp: Date.now()
+            }));
+            
+            window.location.href = "Meteorite.html";
+        }
+
+        function initGoogleAuth() {
+            if (!window.google) {
+                console.error("Google API not loaded");
+                return;
+            }
+            
+            google.accounts.id.initialize({
+                client_id: CONFIG.GOOGLE_CLIENT_ID,
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: false
+            });
+            
+            if (document.getElementById('googleSignIn')) {
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignIn'),
+                    { theme: 'filled_blue', size: 'large', text: 'signin_with' }
+                );
+            }
+            
+            if (document.getElementById('googleSignUp')) {
+                google.accounts.id.renderButton(
+                    document.getElementById('googleSignUp'),
+                    { theme: 'filled_blue', size: 'large', text: 'signup_with' }
+                );
+            }
+        }
+
+        // Load Google API - Only declared once
+        function loadGoogleAuth() {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = initGoogleAuth;
+            script.onerror = () => {
+                document.getElementById('loginError').textContent = "Google Sign-In unavailable";
+                document.getElementById('loginError').style.display = 'block';
+            };
+            document.head.appendChild(script);
+        }
+
+        // Form submissions
+        function setupFormHandlers() {
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                if (!email || !password) {
+                    document.getElementById('loginError').textContent = "Please fill all fields";
+                    document.getElementById('loginError').style.display = 'block';
+                    return;
+                }
+                
+                // Only set user data and redirect after successful form submission
+                localStorage.setItem('meteorite_user', JSON.stringify({
+                    email: email,
+                    timestamp: Date.now()
+                }));
+                
+                window.location.href = "Meteorite.html";
+            });
+
+            document.getElementById('signupForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirm) {
+                    document.getElementById('signupError').textContent = "Passwords don't match";
+                    document.getElementById('signupError').style.display = 'block';
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    document.getElementById('signupError').textContent = "Password must be at least 8 characters";
+                    document.getElementById('signupError').style.display = 'block';
+                    return;
+                }
+                
+                // Only set user data and redirect after successful signup
+                localStorage.setItem('meteorite_user', JSON.stringify({
+                    email: email,
+                    timestamp: Date.now()
+                }));
+                
+                window.location.href = "Meteorite.html";
+            });
+        }
+
+        // Initialize everything - REMOVED THE AUTO-REDIRECT CHECK
+        window.addEventListener('DOMContentLoaded', () => {
+            setInterval(createComet, 1000);
+            createComet();
+            setupFormToggles();
+            setupFormHandlers();
+            loadGoogleAuth();
+        });
+    </script>
+</body>
+</html>
